@@ -4,6 +4,7 @@ _unittest.py - Recipes using unittest
 """
 import os
 import shutil
+from pathlib import Path
 import unittest
 import unittest.mock
 
@@ -24,12 +25,6 @@ def clear_dir(path):
             os.remove(os.path.join(root, filename))
 
 
-# Helper method for test cases.
-def touch_file(path):
-    """Touch the file at the given path."""
-    open(path, 'w').close()
-
-
 class TempDirTestCase(unittest.TestCase):
     """Base TestCase that creates a temporary directory.
 
@@ -41,17 +36,16 @@ class TempDirTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         """Determine which testing path to use."""
         super().__init__(*args, **kwargs)
-        if os.path.isdir('/tmp'):
-            self.temp_dir = '/tmp/unittest_temp_dir'
-        else:
-            self.temp_dir = './unittest_temp_dir'
+        self.temp_dir = Path('/tmp')
+        if not self.temp_dir.exists():
+            self.temp_dir = Path('unittest_temp_dir')
 
     def setUp(self):
         """Create temporary directory.
 
         Throw an error if the testing directory existed before.
         """
-        os.mkdir(self.temp_dir)
+        self.temp_dir.mkdir()
 
     def tearDown(self):
         """Clear temporary directory."""
@@ -62,33 +56,35 @@ class TempDirTestCase(unittest.TestCase):
 class ClearDirTest(TempDirTestCase):
     """Test case for clear_dir function."""
     # Test paths should be relative to a root temp_dir.
-    TEST_SUBDIRS = ['sub', 'sub/dir', 'sub/sub']
-    TEST_FILES = ['A.txt', 'B.txt', 'sub/C.txt', 'sub/sub/D.txt']
+    TEST_SUBDIRS = [Path('sub'), Path('sub', 'dir'), Path('sub', 'sub')]
+    TEST_FILES = [Path('A.txt'), Path('B.txt'), Path('sub', 'C.txt'),
+                  Path('sub', 'sub', 'D.txt')]
 
     def __init__(self, *args, **kwargs):
         """Calculate full paths of testing files."""
         super().__init__(*args, **kwargs)
-        self.test_file_paths = [os.path.join(self.temp_dir, rel_path)
+        self.test_file_paths = [self.temp_dir.joinpath(rel_path)
                                 for rel_path in self.TEST_FILES]
+
 
     def setUp(self):
         """Create testing files."""
         super().setUp()
         for subdir in self.TEST_SUBDIRS:
-            os.makedirs(subdir, exist_ok=True)
-            assert os.path.isdir(subdir)
+            subdir.mkdir(exist_ok=True)
+            assert subdir.is_dir()
         for path in self.test_file_paths:
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            touch_file(path)
-            assert os.path.isfile(path)
+            path.parent.mkdir(exist_ok=True)
+            path.touch()
+            assert path.is_file()
 
     def test_clear_dir(self):
         """Test that clear_dir removes all files but no subdirectories."""
         clear_dir(self.temp_dir)
         for path in self.test_file_paths:
-            self.assertFalse(os.path.exists(path))
+            self.assertFalse(path.exists())
         for subdir in self.TEST_SUBDIRS:
-            self.assertTrue(os.path.isdir(subdir))
+            self.assertTrue(subdir.exists())
 
 
 class ClearDirMissingInputTest(unittest.TestCase):
@@ -96,7 +92,7 @@ class ClearDirMissingInputTest(unittest.TestCase):
     def test_nonexistant_input(self):
         """Test that FileNotFoundError is thrown for nonexistant input."""
         with self.assertRaises(FileNotFoundError):
-            clear_dir('./nonexistant_path')
+            clear_dir('nonexistant_path')
 
 
 class ClearDirFileInputTest(TempDirTestCase):
@@ -104,13 +100,13 @@ class ClearDirFileInputTest(TempDirTestCase):
     def __init__(self, *args, **kwargs):
         """Calculate testing file path."""
         super().__init__(*args, **kwargs)
-        self.test_file = os.path.join(self.temp_dir, 'testfile.txt')
+        self.test_file = self.temp_dir.joinpath('testfile.txt')
 
     def setUp(self):
         """Create the testing file."""
         super().setUp()
-        touch_file(self.test_file)
-        assert os.path.exists(self.test_file)
+        self.test_file.touch()
+        assert self.test_file.is_file()
 
     def test_file_input(self):
         """Check that ValueError is raised when the input is a file."""
