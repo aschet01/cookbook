@@ -114,6 +114,28 @@ class ClearDirFileInputTest(TempDirTestCase):
             clear_dir(self.test_file)
 
 
+class MockClearDirTest(ClearDirTest):
+    """Mock out os.remove in clear_dir."""
+    def __init__(self, *args, **kwargs):
+        """Store a path to a temporary file in the temp_dir."""
+        super().__init__(*args, **kwargs)
+        self.manifest_file = self.temp_dir.joinpath('removed_files')
+
+    def test_clear_dir(self):
+        def track_file(path):
+            """Append the input path to the manifest file."""
+            with self.manifest_file.open('a') as manifest:
+                print(path, file=manifest)
+
+        with unittest.mock.patch('os.remove', track_file):
+            clear_dir(self.temp_dir)
+
+        cleared_files = self.manifest_file.read_text().split('\n')
+
+        for path in self.test_file_paths:
+            self.assertIn(str(path), cleared_files)
+
+
 # Or use `python -m unittest [path]`
 if __name__ == '__main__':
     unittest.main()
