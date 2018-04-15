@@ -65,12 +65,14 @@ class ClearDirTest(TempDirTestCase):
         super().__init__(*args, **kwargs)
         self.test_file_paths = [self.temp_dir.joinpath(rel_path)
                                 for rel_path in self.TEST_FILES]
+        self.test_subdirs = [self.temp_dir.joinpath(rel_path)
+                             for rel_path in self.TEST_SUBDIRS]
 
 
     def setUp(self):
         """Create testing files."""
         super().setUp()
-        for subdir in self.TEST_SUBDIRS:
+        for subdir in self.test_subdirs:
             subdir.mkdir(exist_ok=True)
             assert subdir.is_dir()
         for path in self.test_file_paths:
@@ -83,7 +85,7 @@ class ClearDirTest(TempDirTestCase):
         clear_dir(self.temp_dir)
         for path in self.test_file_paths:
             self.assertFalse(path.exists())
-        for subdir in self.TEST_SUBDIRS:
+        for subdir in self.test_subdirs:
             self.assertTrue(subdir.exists())
 
 
