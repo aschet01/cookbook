@@ -1,0 +1,2 @@
+gg='git log --abbrev-commit --all -graph --decorate --color'
+grep='grep -I --color'
