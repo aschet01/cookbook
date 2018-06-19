@@ -51,6 +51,12 @@ np.sort(a1)
 
 # Generating data
 # Random data
+# Set the seed
+np.random.seed(31323435)
+# Get a random number
+rand_num = np.random.rand()  # Float
+rand_int = np.random(0, 10)  # in range(0, 10)
+
 # args are: mean, std, count
 rands = np.random.normal(5.0, 0.5, 10)
 # Round to 2 decimal places
