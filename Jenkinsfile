@@ -5,20 +5,19 @@
 pipeline {
     agent any
     environment {
-        JENKINSS_ROOT = "${JENKINS_HOME}"
+        JENKINS_ROOT = "${JENKINS_HOME}"
     }
     stages {
         stage('Build') {
             steps {
                 echo "Build ${env.BUILD_ID} for Job ${env.JOB_ID} on ${env.JENKINS_URL}"
-                sh 'git clone https://github.com/aschet01/cookbook.git'
-                sh 'cd cookbook'
+                sh 'env'
             }
         }
         stage('Test') {
             steps {
                 sh 'pwd; ls -al'
-                // sh 'python -m unittest python/_unittest.py'
+                sh 'python -m unittest python/_unittest.py'
                 sh 'env'
             }
         }
