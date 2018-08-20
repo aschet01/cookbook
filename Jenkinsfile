@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo 'Testing..'
+                sh 'python -m unittest python/_unittest.py'
                 sh 'env'
             }
         }
