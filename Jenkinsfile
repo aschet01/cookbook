@@ -8,14 +8,14 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                echo "Build ${env.BUILD_ID} for Job ${env.JOB_ID} on ${env.JENKINS_URL}"
                 sh 'git clone https://github.com/aschet01/cookbook.git'
-                sh 'env'
-                sh 'ls'
+                sh 'cd cookbook'
             }
         }
         stage('Test') {
             steps {
-                sh 'pwd; echo; ls -al'
+                sh 'pwd; ls -al'
                 // sh 'python -m unittest python/_unittest.py'
                 sh 'env'
             }
