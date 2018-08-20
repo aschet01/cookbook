@@ -4,7 +4,9 @@
  */
 pipeline {
     agent any
-
+    environment {
+        JENKINSS_ROOT = "${JENKINS_HOME}"
+    }
     stages {
         stage('Build') {
             steps {
