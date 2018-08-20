@@ -14,6 +14,7 @@ pipeline {
         }
         stage('Test') {
             steps {
+                sh 'pwd; echo; ls -al'
                 sh 'python -m unittest python/_unittest.py'
                 sh 'env'
             }
