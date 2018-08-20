@@ -8,14 +8,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+                sh 'git clone https://github.com/aschet01/cookbook.git'
                 sh 'env'
+                sh 'ls'
             }
         }
         stage('Test') {
             steps {
                 sh 'pwd; echo; ls -al'
-                sh 'python -m unittest python/_unittest.py'
+                // sh 'python -m unittest python/_unittest.py'
                 sh 'env'
             }
         }
