@@ -1,1 +1,1 @@
-grep='grep -I --color'
+alias grep='grep -I --color'
